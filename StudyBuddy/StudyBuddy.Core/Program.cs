@@ -15,7 +15,8 @@ namespace StudyBuddy.Core
             {
             using (var nancySelfHost = new NancyHost(new Uri("http://localhost:12345/")))
                 {
-                Console.WriteLine("Application running on: http://localhost:12345/, press any key to exit");
+                nancySelfHost.Start();
+                Console.WriteLine("Application running on: localhost:12345/, press any key to exit");
                 Console.ReadKey();
                 }
             }
