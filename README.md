@@ -1,0 +1,2 @@
+# StudyBuddy
+Study for fun
