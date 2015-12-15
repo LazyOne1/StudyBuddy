@@ -1,15 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Net.Mime;
-using System.Runtime.InteropServices.ComTypes;
 using Nancy;
 using Nancy.Authentication.Token;
-using Nancy.Conventions;
-using Nancy.Security;
 using Newtonsoft.Json;
 using StudyBuddy.Core.Models;
-using StudyBuddy.DbModule;
 using StudyBuddy.DbModule.DbHelpers;
 
 namespace StudyBuddy.Core.Controllers
@@ -27,7 +21,7 @@ namespace StudyBuddy.Core.Controllers
                     if (!dbWrapper.DoesDbExist())
                         {
                         StudyBuddyDbAssistant.CreateDatabase("AuthenticationDbCore");
-                        StudyBuddyDbAssistant.CreateTables("AuthenticationDbCore");
+                        StudyBuddyDbAssistant.CreateAuthenticationTables("AuthenticationDbCore");
                         }
                     }
                 var loginData = ParseAuthData(Request.Body);
@@ -50,12 +44,6 @@ namespace StudyBuddy.Core.Controllers
                     }
                 };
 
-            Get["/validatetoken/"] = x =>
-                {
-                this.RequiresAuthentication();
-                return "Yay!";
-                };
-
             Post["/register/"] = x =>
                 {
                 var regData = ParseAuthData(Request.Body);
@@ -72,10 +60,27 @@ namespace StudyBuddy.Core.Controllers
                     if (!dbWrapper.DoesDbExist())
                         {
                         StudyBuddyDbAssistant.CreateDatabase("AuthenticationDbCore");
-                        StudyBuddyDbAssistant.CreateTables("AuthenticationDbCore");
+                        StudyBuddyDbAssistant.CreateAuthenticationTables("AuthenticationDbCore");
                         }
                     }
-                return HttpStatusCode.OK;
+
+                var identity = AuthenticationSingleton.AuthenticateUser(regData["username"],
+                    regData["password"]);
+                if (identity == null)
+                    {
+                    var response = (Response) JsonConvert.SerializeObject(FormErrorResponse(-1));
+                    response.ContentType = "application/json";
+                    response.StatusCode = HttpStatusCode.NotAcceptable;
+                    return response;
+                    }
+                else
+                    {
+                    var token = tokenizer.Tokenize(identity, Context);
+                    return new
+                        {
+                        Token = token
+                        };
+                    }
                 };
             }
 
@@ -86,6 +91,8 @@ namespace StudyBuddy.Core.Controllers
                 return JsonConvert.DeserializeObject<Dictionary<string, string>>(reader.ReadToEnd());
                 }
             }
+
+
 
         public Dictionary<string, string> FormErrorResponse(int error)
             {
@@ -103,6 +110,10 @@ namespace StudyBuddy.Core.Controllers
                     case -4:
                         errorResponse.Add("status", "error");
                         errorResponse.Add("case", "Incorrect characters in username or password.");
+                        break;
+                    case -5:
+                        errorResponse.Add("status", "error");
+                        errorResponse.Add("case", "Username or password is too short.");
                         break;
                     default:
                         break;

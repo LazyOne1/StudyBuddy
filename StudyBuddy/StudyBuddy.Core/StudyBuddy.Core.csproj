@@ -68,13 +68,20 @@
   <ItemGroup>
     <Compile Include="Authentication\UserIdentity.cs" />
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Controllers\QuizzController.cs" />
     <Compile Include="Controllers\UserAuthorizationController.cs" />
+    <Compile Include="Data\QuizzMeta.cs" />
     <Compile Include="Models\AuthenticationModel.cs" />
+    <Compile Include="Models\QuizzModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Data\Quizz.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

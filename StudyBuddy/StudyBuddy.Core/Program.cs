@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Nancy.Hosting.Self;
-using StudyBuddy.DbModule;
+using StudyBuddy.DbModule.DbHelpers;
 
 //Self-host logic
 namespace StudyBuddy.Core

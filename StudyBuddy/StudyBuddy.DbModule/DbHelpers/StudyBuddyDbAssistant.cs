@@ -1,6 +1,6 @@
 ﻿using System.Data.SQLite;
 
-namespace StudyBuddy.DbModule
+namespace StudyBuddy.DbModule.DbHelpers
     {
     public class StudyBuddyDbAssistant
         {
@@ -9,7 +9,32 @@ namespace StudyBuddy.DbModule
             SQLiteConnection.CreateFile(database + ".sqlite");
             }
 
-        public static void CreateTables(string database)
+        public static void CreateQuizzTables(string database)
+            {
+            using (var sqLiteConnection = new SQLiteConnection("DataSource=" + database + ".sqlite;Version=3;"))
+                {
+                using (
+                    var sqLiteCommand =
+                        new SQLiteCommand(
+                            "create table Quizzes (QuizzID INTEGER PRIMARY KEY AUTOINCREMENT, QuizzName varchar(25) UNIQUE, Description varchar(50))")
+                    )
+                    {
+                    sqLiteCommand.Connection = sqLiteConnection;
+                    sqLiteConnection.Open ();
+                    sqLiteCommand.ExecuteNonQuery ();
+
+                    sqLiteCommand.CommandText =
+                        "create table Questions (QuestionID INTEGER PRIMARY KEY AUTOINCREMENT, 'QuizzID' INTEGER REFERENCES 'Quizzes' ('QuizzID'), 'Question' varchar(25))";
+                    sqLiteCommand.ExecuteNonQuery ();
+
+                    sqLiteCommand.CommandText =
+                       "create table Answers (AnswerID INTEGER PRIMARY KEY AUTOINCREMENT, 'QuestionID' INTEGER REFERENCES 'Questions' ('QuestionID'), 'Answer' varchar(25), Is_Correct INTEGER default 0)";
+                    sqLiteCommand.ExecuteNonQuery ();
+                    }
+                }
+            }
+
+        public static void CreateAuthenticationTables(string database)
             {
             using (var sqLiteConnection = new SQLiteConnection("DataSource=" + database + ".sqlite;Version=3;"))
                 {
